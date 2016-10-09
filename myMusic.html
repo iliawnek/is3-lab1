@@ -1,0 +1,213 @@
+﻿
+
+<!--
+Name: Ken Li (2131620L)
+This HTML document recreates a section of the song
+'Your Hand in Mine' by the band 'Explosions in the Sky'
+using midi.js and music.js.
+It is currently working.
+
+Note notation parsing (i.e. C#3) was tricky,
+and transcribing the melody was tedious and error-prone.
+JavaScript syntax itself was easy to learn; caused no problems.
+-->
+
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>IS3 My Music</title>
+  <meta name="author" content="Ken Li (2131620L)"/>
+  <script src="midi.js"></script>
+  <script src="music.js"></script>
+</head>
+
+<body>
+  <h1>My musical objects</h1>
+
+  <!-- Reuse this, or add additional text areas to display your songs -->
+  <textarea id="show" rows="10" cols="80"></textarea>
+  <br>
+
+  <!-- Reuse this, or add additional buttons to download your songs -->
+  <button onclick="toMidi(mySong).save()">Download YHIM</button>
+
+  <script>
+    function note(noteString) {
+      var letter = noteString.charAt(0).toLowerCase();
+      var accidental;
+      var octave;
+      var second = noteString.charAt(1);
+      var third = noteString.charAt(2);
+
+      if (third !== '') {
+        octave = parseInt(third);
+        if (second === '#') accidental = 1;
+        else accidental = -1;
+      } else if (second === '') {
+        accidental = 0;
+        octave = 4;
+      } else if (second === '#') {
+        accidental = 1;
+        octave = 4;
+      } else if (second === 'b') {
+        accidental = -1;
+        octave = 4;
+      } else {
+        accidental = 0;
+        octave = parseInt(second);
+      }
+
+      var notes = {
+        c: 1,
+        d: 3,
+        e: 5,
+        f: 6,
+        g: 8,
+        a: 10,
+        b: 12,
+      };
+      return notes[letter] + octave * 12 + accidental;
+    }
+
+    function duration(nth, dotted) {
+      return (128 / nth) * (dotted ? 1.5 : 1);
+    }
+
+    var cSharpMinor = [
+       new Note(note('C#3'), duration(2, true)),
+       new Note(note('G#3'), duration(2, true)),
+       new Note(note('E4'), duration(2, true)),
+    ];
+
+    var eMajor = [
+       new Note(note('E3'), duration(2, true)),
+       new Note(note('B3'), duration(2, true)),
+       new Note(note('G#4'), duration(2, true)),
+    ];
+
+    var bMajor = [
+       new Note(note('B2'), duration(2, true)),
+       new Note(note('F#3'), duration(2, true)),
+       new Note(note('D#4'), duration(2, true)),
+    ];
+
+    var aMajor = [
+       new Note(note('A2'), duration(2, true)),
+       new Note(note('E3'), duration(2, true)),
+       new Note(note('C#4'), duration(2, true)),
+    ];
+
+    var arpeggios = [
+      [
+       new Note(note('C#3'), duration(8)),
+       new Note(note('E5'), duration(8)),
+       new Note(note('G#5'), duration(8)),
+       new Note(note('E5'), duration(8)),
+       new Note(note('G#5'), duration(8)),
+       new Note(note('E5'), duration(8)),
+      ],
+      [
+       new Note(note('E2'), duration(8)),
+       new Note(note('E5'), duration(8)),
+       new Note(note('F#5'), duration(8)),
+       new Note(note('E5'), duration(8)),
+       new Note(note('F#5'), duration(8)),
+       new Note(note('E5'), duration(8)),
+      ],
+      [
+       new Note(note('B3'), duration(8)),
+       new Note(note('Eb5'), duration(8)),
+       new Note(note('F#5'), duration(8)),
+       new Note(note('E5'), duration(8)),
+       new Note(note('F#5'), duration(8)),
+       new Note(note('Eb5'), duration(8)),
+      ],
+      [
+       new Note(note('B3'), duration(8)),
+       new Note(note('Eb5'), duration(8)),
+       new Note(note('F#5'), duration(8)),
+       new Note(note('E5'), duration(8)),
+       new Note(note('F#5'), duration(8)),
+       new Note(note('Eb5'), duration(8)),
+      ],
+      [
+       new Note(note('A3'), duration(8)),
+       new Note(note('C#5'), duration(8)),
+       new Note(note('E5'), duration(8)),
+       new Note(note('Eb5'), duration(8)),
+       new Note(note('C#5'), duration(8)),
+       new Note(note('B4'), duration(8)),
+      ],
+      [
+       new Note(note('E2'), duration(8)),
+       new Note(note('Ab4'), duration(8)),
+       new Note(note('B4'), duration(8)),
+       new Note(note('B4'), duration(8)),
+       new Note(note('B4'), duration(8)),
+       new Note(note('Ab4'), duration(8)),
+      ],
+      [
+       new Note(note('B3'), duration(8)),
+       new Note(note('E5'), duration(8)),
+       new Note(note('Eb5'), duration(8)),
+       new Note(note('B4'), duration(8)),
+       new Note(note('Eb5'), duration(8)),
+       new Note(note('B4'), duration(8)),
+      ],
+      [
+       new Note(note('B3'), duration(8)),
+       new Note(note('E5'), duration(8)),
+       new Note(note('Eb5'), duration(8)),
+       new Note(note('B4'), duration(8)),
+       new Note(note('Eb5'), duration(8)),
+       new Note(note('E5'), duration(8)),
+      ],
+    ];
+
+    function repeat(sequence, times) {
+      var repeatedSequence = [];
+      for (var i = 0; i < times; i++) {
+        repeatedSequence.push(sequence);
+      }
+      return new Seq(repeatedSequence);
+    }
+
+    var chords = new Seq([
+        new Par(cSharpMinor),
+        new Par(eMajor),
+        new Par(bMajor),
+        new Par(bMajor),
+        new Par(aMajor),
+        new Par(eMajor),
+        new Par(bMajor),
+        new Par(bMajor),
+    ]);
+
+    var arpeggios = new Seq([
+        new Seq(arpeggios[0]),
+        new Seq(arpeggios[1]),
+        new Seq(arpeggios[2]),
+        new Seq(arpeggios[3]),
+        new Seq(arpeggios[4]),
+        new Seq(arpeggios[5]),
+        new Seq(arpeggios[6]),
+        new Seq(arpeggios[7]),
+    ]);
+
+    var measure = new Par([
+      chords,
+      arpeggios,
+    ]);
+
+    var mySong = repeat(measure, 2).tempo(4);
+
+    document.getElementById("show").value += "Song: " + mySong.toString() + "\n\n";
+  </script>
+
+
+</body>
+
+</html>
